@@ -15,6 +15,23 @@ const accepting = ['q3', 'q4','q5'];    // user input
 const non_accepting = ['q0','q1', 'q2', 'q6'];  // user input (can calulate khuud)
 const alphabet = ['a', 'b'];    // user input
 
+/* example 2
+const stateNames = ['q0','q1','q2','q3','q4','q5']; // user input
+
+let table = { // user input
+  'q0': {0: 'q1', 1: 'q2'},
+  'q1': {0: 'q3', 1: 'q5'},
+  'q2': {0: 'q1', 1: 'q4'},
+  'q3': {0: 'q3', 1: 'q5'},
+  'q4': {0: 'q5', 1: 'q2'},
+  'q5': {0: 'q4', 1: 'q1'},
+};
+
+const startState = 'q0';    // user input
+const accepting = ['q5', 'q4'];    // user input
+const non_accepting = ['q0','q1', 'q2', 'q3'];  // user input (can calulate khuud)
+const alphabet = ['0', '1'];    // user input
+*/
 
 // variables for storing minimised dfa outputs
 minTable = table;
