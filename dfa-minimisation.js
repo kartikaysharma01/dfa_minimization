@@ -1,8 +1,6 @@
+const stateNames = ['q0','q1','q2','q3','q4','q5','q6']; // user input
 
-const stateNames = ['q0','q1','q2','q3','q4','q5','q6'];
-var minStateNames = [];
-
-let table = {
+let table = { // user input
   'q0': {a: 'q1', b: 'q2'},
   'q1': {a: 'q3', b: 'q4'},
   'q2': {a: 'q3', b: 'q5'},
@@ -11,21 +9,24 @@ let table = {
   'q5': {a: 'q5', b: 'q4'},
   'q6': {a: 'q2', b: 'q6'},
 };
+
+const startState = 'q0';    // user input
+const accepting = ['q3', 'q4','q5'];    // user input
+const non_accepting = ['q0','q1', 'q2', 'q6'];  // user input (can calulate khuud)
+const alphabet = ['a', 'b'];    // user input
+
+
+// variables for storing minimised dfa outputs
 minTable = table;
+var minStateNames = [];
+var noOfMinimisedStates;
+var minStartState;
+var minAccepting = [];
 
 var particitions = {
     "P0": [],
     "P1": [],
 };
-
-var noOfMinimisedStates;
-var stack = [];
-const startState = 'q0';
-var minStartState;
-const accepting = ['q3', 'q4','q5'];
-var minAccepting = [];
-const non_accepting = ['q0','q1', 'q2', 'q6'];
-const alphabet = ['a', 'b'];
 
 function isInSameGroup( x,  y) {
     for(var key in particitions) {
@@ -46,7 +47,9 @@ function removeItemOnce(arr, value) {
   }
 
 function removeUnReachable(table) {
+    var stack = [];
     var visited = [];
+
     stack.push(startState);
     
     while(stack.length){
@@ -79,6 +82,8 @@ function removeUnReachable(table) {
 
 
 function minimiseDFA(table) {
+    removeUnReachable(table);
+
     particitions["P0"] = non_accepting;
     particitions["P1"] = accepting;
     
@@ -93,14 +98,14 @@ function minimiseDFA(table) {
                     var a = table[particitions[key][i]][alphabet[k]];
                     var b = table[particitions[key][j]][alphabet[k]];
                     if(a == b) {
-                        console.log(particitions[key][i] +" and "+ particitions[key][j] + " make the same transition for " + alphabet[k] + "\n");
+                        // console.log(particitions[key][i] +" and "+ particitions[key][j] + " make the same transition for " + alphabet[k] + "\n");
                         var arr = [particitions[key][i],particitions[key][j]];
                         if (k == alphabet.length -1) {
                             canLiveTogether.push(particitions[key][i]);
                             canLiveTogether.push(particitions[key][j]);
                         }
                     } else if (isInSameGroup(a,b)) {
-                        console.log(particitions[key][i] +" and "+ particitions[key][j] + " make the transition in same group for " + alphabet[k] + "\n");
+                        // console.log(particitions[key][i] +" and "+ particitions[key][j] + " make the transition in same group for " + alphabet[k] + "\n");
                         var arr = [particitions[key][i],particitions[key][j]];
                         if (k == alphabet.length -1) {
                             canLiveTogether.push(particitions[key][i]);
@@ -133,6 +138,7 @@ function minimiseDFA(table) {
         }
     }
     
+    console.log("Below is how we are dividing the states");
     console.log(particitions);
     noOfMinimisedStates = Object.keys(particitions).length.toString();
     makeMinimisedTransmitTable(table, particitions);
@@ -142,7 +148,8 @@ function makeMinimisedTransmitTable(table, particitions) {
     for(let key in particitions) {
         // if there are equivalent grps in this group/partition
         if(particitions[key].length>1) {
-            // 
+            // in the below section, we combine the equivqlent states in one, add transitions for the combined stages
+            // check in any if the combined state is to be added in inital state or final state
             for(let j=0; j<alphabet.length; j++) {
                 var a = "";
                 for(let i=0; i<particitions[key].length; i++) {
@@ -166,6 +173,8 @@ function makeMinimisedTransmitTable(table, particitions) {
                 }
             }
         } else {
+            // this is non-equivalent state, we check if it is final ot initial state. 
+            // we will handle transitions for this state later
             if(accepting.includes(particitions[key])) {
                 minAccepting.push(particitions[key]);
             }
@@ -189,12 +198,12 @@ function makeMinimisedTransmitTable(table, particitions) {
     dropAllUnwantedKeys(minTable);
 
 
-    console.log("\n No of states in minised DFA: " + noOfMinimisedStates);
+    console.log("\n\nNo of states in minised DFA: " + noOfMinimisedStates);
     console.log("Accepting States of minised DFA: " + minAccepting);
     console.log("Start State of minised DFA: " + minStartState);
     console.log("Named of States of minised DFA: " + minStateNames + "\n");
 
-    console.log("here to change transitions to mergred states as they do not exist anymore");
+    console.log("\nhere to change transitions to mergred states as they do not exist anymore");
     for(let i =0; i<minStateNames.length; i++) {
         // console.log("\n\nworking on " + minStateNames[i].toString());
         // if this state was present in intial table
@@ -229,7 +238,7 @@ function makeMinimisedTransmitTable(table, particitions) {
 }
 
 function dropAllUnwantedKeys(minTable) {
-    console.log("here to delete all unwanteed keys from mintable");
+    console.log("\nhere to delete all unwanteed keys from mintable");
     var x = Object.keys(minTable);
     for (let i=0; i<x.length; i++) {
         var y = 0;
@@ -250,5 +259,4 @@ function dropAllUnwantedKeys(minTable) {
     }
 }
 
-removeUnReachable(table);
 minimiseDFA(table);
