@@ -1,6 +1,4 @@
-// Online Javascript Editor for free
-// Write, Edit and Run your Javascript code using JS Online Compiler
-    
+
 const stateNames = ['q0','q1','q2','q3','q4','q5','q6'];
 var minStateNames = [];
 
@@ -141,16 +139,23 @@ function minimiseDFA(table) {
 }
 
 function makeMinimisedTransmitTable(table, particitions) {
-
     for(let key in particitions) {
+        // if there are equivalent grps in this group/partition
         if(particitions[key].length>1) {
-            var a = "";
+            // 
             for(let j=0; j<alphabet.length; j++) {
+                var a = "";
                 for(let i=0; i<particitions[key].length; i++) {
+                    if (!a.includes(table[particitions[key][i]][alphabet[j]])) {
+                        a = a + table[particitions[key][i]][alphabet[j]];
+                    }
 
-                    console.log("\na = " + a);
-                    a = a + table[particitions[key][i]][alphabet[j]];
-                    minTable[particitions[key].join('')][alphabet[j]] = a;
+                    if (Object.keys(minTable).includes(particitions[key].join(''))) {
+                        minTable[particitions[key].join('')][[alphabet[j]]] = a;
+                    } else {
+                        minTable[particitions[key].join('')] = {[alphabet[j]]: a};
+                    }
+                    
                     if(accepting.includes(particitions[key][i])) {
                         minAccepting.push(particitions[key].join(''));
                     }
@@ -171,52 +176,79 @@ function makeMinimisedTransmitTable(table, particitions) {
         }
     }
 
+//    var xc = Object.keys(minTable);
+//     console.log(xc);
+//     for (let i=0; i<xc.length; i++) {
+//         console.log(minTable[xc[i]])
+//     }
+    
     minAccepting = [...new Set(minAccepting)];
     minStartState = [...new Set(minStartState)];
     minStateNames = [...new Set(minStateNames)];
 
-    console.log("\nnoOfMinimisedStates " + noOfMinimisedStates);
-    console.log("minAccepting " + minAccepting);
-    console.log("minStartState " + minStartState);
-    console.log("minStateNames " + minStateNames + "\n");
+    dropAllUnwantedKeys(minTable);
 
 
-    // for(let i=0; i<minStateNames.length; i++) {
-    //     // console.log("\n\nhere = " + minStateNames[i] + " stateNames " + stateNames);
-    //     // console.log("b " + stateNames.includes(minStateNames[i].toString()))
+    console.log("\n No of states in minised DFA: " + noOfMinimisedStates);
+    console.log("Accepting States of minised DFA: " + minAccepting);
+    console.log("Start State of minised DFA: " + minStartState);
+    console.log("Named of States of minised DFA: " + minStateNames + "\n");
 
-    //     // if state of min dfa is there is normal dfa
-    //     if (stateNames.includes(minStateNames[i].toString())) {
-    //         // console.log("in");
+    console.log("here to change transitions to mergred states as they do not exist anymore");
+    for(let i =0; i<minStateNames.length; i++) {
+        // console.log("\n\nworking on " + minStateNames[i].toString());
+        // if this state was present in intial table
+        if (stateNames.includes(minStateNames[i].toString())) {
+            // console.log("it a orignal node");
+            // for each alphabet of this state
+            for(let k=0; k<alphabet.length; k++) {
+                // console.log(minTable[minStateNames[i].toString()][alphabet[k]]);
+                // check if the transition in original table land on still existing states
+                if (!minStateNames.includes(minTable[minStateNames[i].toString()][alphabet[k]])) {
+                    // if not, match this state to the new combined state
+                    for (let j =0; j<minStateNames.length; j++) {
+                        // console.log("working on min state = " + minStateNames[j] + " and wrong trans " + minTable[minStateNames[i].toString()][alphabet[k]]);
+                        if(minStateNames[j].includes(minTable[minStateNames[i].toString()][alphabet[k]])) {
+                            minTable[minStateNames[i].toString()][alphabet[k]] = minStateNames[j];
+                        }
+                        // else {
+                        //     console.log("Code sholf not reach here");
+                        // }
+                    }
+                }
+            }
+        }
+    }
 
-    //         // for each ablphabet
-    //         for(let k=0; k<alphabet.length; k++) {
-    //             // check if the transition in original table match the ones
-    //             for (let j=0; j<minStateNames.length; j++) {
-    //                 console.log("k = ", minStateNames[k])
-    //                 console.log("there is a transition for " + minStateNames[i] + alphabet[k] + " at " + minStateNames[j] + " == " + minStateNames[j].includes(table[minStateNames[i].toString()][alphabet[k]]))
-    //                 console.log("minStateNames[j]" + minStateNames[j]);
-                    
-    //                 if (minStateNames[j].includes(table[minStateNames[i].toString()][alphabet[k]])) {
-    //                     // console.log("minTable" + minTable)
-    //                     var ab = alphabet[k]
-    //                     var bc = minStateNames[j].toString();
-    //                     minTable[minStateNames[i].toString()] = {aa:bc};
-    //                     break;
-    //                 }
-    //             }
-    //         }
-    //     } else {
-    //         // minTable[minStateNames[i].toString()] = "tb";
-    //     }
-    // }
-
-    console.log(minTable['q0']);
+    var xc = Object.keys(minTable);
+    console.log(xc);
+    for (let i=0; i<xc.length; i++) {
+        console.log(minTable[xc[i]])
+    }
     
 }
 
+function dropAllUnwantedKeys(minTable) {
+    console.log("here to delete all unwanteed keys from mintable");
+    var x = Object.keys(minTable);
+    for (let i=0; i<x.length; i++) {
+        var y = 0;
+        for (let j=0; j<minStateNames.length; j++) {
+            // console.log(" working on key " + x[i] + " and state " + minStateNames[j]);
+            if(x[i] == minStateNames[j]){
+                // console.log("matched");
+                y = 1;
+                // matched, cool do nothing
+                break;
+            }
+        }
+        if(y == 0) {
+            // console.log("deleting key " + x[i] + "from minTable");
+            delete minTable[x[i]];
+        }
 
+    }
+}
 
-console.log("dfsdft " + table['q0']['a']);
 removeUnReachable(table);
 minimiseDFA(table);
