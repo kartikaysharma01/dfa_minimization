@@ -1,4 +1,8 @@
 const stateNames = ['q0','q1','q2','q3','q4','q5','q6']; // user input
+const startState = 'q0';    // user input
+const accepting = ['q3', 'q4','q5'];    // user input
+const non_accepting = ['q0','q1', 'q2', 'q6'];  // user input (can calulate khuud)
+const alphabet = ['a', 'b'];    // user input
 
 let table = { // user input
   'q0': {a: 'q1', b: 'q2'},
@@ -9,11 +13,6 @@ let table = { // user input
   'q5': {a: 'q5', b: 'q4'},
   'q6': {a: 'q2', b: 'q6'},
 };
-
-const startState = 'q0';    // user input
-const accepting = ['q3', 'q4','q5'];    // user input
-const non_accepting = ['q0','q1', 'q2', 'q6'];  // user input (can calulate khuud)
-const alphabet = ['a', 'b'];    // user input
 
 /* example 2
 const stateNames = ['q0','q1','q2','q3','q4','q5']; // user input
